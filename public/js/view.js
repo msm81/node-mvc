@@ -280,10 +280,91 @@ class BlogView {
 
 
     //   attachEditFormEventListeners() {}
+    attachEditFormEventListeners() {
+        const form = document.getElementById('edit-post-form');
+        const cancelBtn = document.getElementById('cancel-edit-btn');
+        const closeXBtn = document.getElementById('close-edit-modal'); // From your HTML
+
+        // Edit Submit
+        if (form) {
+            form.addEventListener('submit', this.handleEditSubmit.bind(this));
+        }
+
+        // Cancel Button
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', this.hideEditModal.bind(this));
+        }
+
+        // X Button
+        if (closeXBtn) {
+            closeXBtn.addEventListener('click', this.hideEditModal.bind(this));
+        }
+
+        // Outside the modal
+        window.onclick = (event) => {
+            if (event.target === this.editModal) {
+                this.hideEditModal();
+            }
+        };
+    }
+
+
     // async handleEditSubmit(e) {}
+    async handleEditSubmit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const postData = {
+            title: formData.get('title').trim(),
+            content: formData.get('content').trim(),
+        };
+
+        this.clearEditFormErrors();
+
+        // Validate
+        const errors = this.validateForm(postData); // We reuse the validation logic
+        if (errors.length > 0) {
+            this.displayEditFormErrors(errors);
+            return;
+        }
+
+        this.notifyObservers('onPostUpdate', {
+            id: this.currentEditId,
+            ...postData
+        });
+    }
+
+
     //   clearEditFormErrors() {}
-    //   handleDelete(postId) {}
+    clearEditFormErrors() {
+        if (!this.editFormContainer) return;
+
+        const errorElements = this.editFormContainer.querySelectorAll('.error-message');
+        const inputElements = this.editFormContainer.querySelectorAll('.error');
+
+        errorElements.forEach(el => el.style.display = 'none');
+        inputElements.forEach(el => el.classList.remove('error'));
+    }
+
+
     //  displayEditFormErrors(errors) {}
+    displayEditFormErrors(errors) {
+        errors.forEach((error) => {
+            const errorElement = document.getElementById(`edit-${error.field}-error`);
+            const inputElement = document.getElementById(`edit-${error.field}`);
+
+            if (errorElement) {
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            }
+
+            if (inputElement) {
+                inputElement.classList.add('error');
+            }
+        });
+    }
+
+
     //  handleDelete(postId) {}
 
     // Form utilities
