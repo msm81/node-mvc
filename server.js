@@ -178,6 +178,23 @@ app.put('/api/posts/:id', (req, res) => {
 });
 
 // DELETE a blog post
+app.delete('/api/posts/:id', (req, res) => {
+    const { id } = req.params;
+    console.log(`🗑️ DELETE /api/posts/${id} - Deleting post`);
+
+    db.run('DELETE FROM posts WHERE id = ?', [id], function(err) {
+        if (err) {
+            console.error('Error deleting post:', err);
+            return res.status(500).json({ error: 'Failed to delete post' });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        res.json({ message: 'Post deleted successfully', id });
+    });
+});
 
 // Initialize and start server
 async function startServer() {
