@@ -138,6 +138,44 @@ app.post('/api/posts', (req, res) => {
 });
 
 // PUT update a blog post
+app.put('/api/posts/:id', (req, res) => {
+    const { id } = req.params;
+    const { title, content } = req.body;
+    console.log(`📝 PUT /api/posts/${id} - Updating post`);
+
+    const sql = `
+    UPDATE posts 
+    SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP 
+    WHERE id = ?
+  `;
+
+    db.run(sql, [title, content, id], function(err) {
+        if (err) {
+            console.error('Error updating post:', err);
+            return res.status(500).json({ error: 'Failed to update post' });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        // Return the updated post
+        db.get('SELECT * FROM posts WHERE id = ?', [id], (err, row) => {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to retrieve updated post' });
+            }
+
+            res.json({
+                id: row.id,
+                title: row.title,
+                content: row.content,
+                author: row.author,
+                createdAt: new Date(row.created_at).toISOString(),
+                updatedAt: new Date(row.updated_at).toISOString()
+            });
+        });
+    });
+});
 
 // DELETE a blog post
 

@@ -83,6 +83,44 @@ class BlogModel {
   }
 
   //   async updatePost(postId, postData) {}
+    async updatePost(postId, postData) {
+        this.setLoading(true);
+
+        try {
+            const validationErrors = this.validatePostData(postData);
+            if (validationErrors.length > 0) {
+                throw new Error(validationErrors.join('. '));
+            }
+
+            const response = await fetch(`${this.apiBaseUrl}/${postId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const updatedPost = await response.json();
+
+            this.posts = this.posts.map(post =>
+                post.id === postId ? updatedPost : post
+            );
+
+            this.notifyObservers('onPostUpdated', updatedPost);
+            return updatedPost;
+
+        } catch (error) {
+            console.error('Error updating post:', error);
+            this.notifyObservers('onError', error.message);
+            throw error;
+        } finally {
+            this.setLoading(false);
+        }
+    }
   
   //   async deletePost(postId) {}
 
