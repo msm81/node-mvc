@@ -366,6 +366,12 @@ class BlogView {
 
 
     //  handleDelete(postId) {}
+    handleDelete(postId) {
+        // Notify the controller. The controller will handle the
+        // "Are you sure?" confirmation and the API call.
+        console.log('I executed delete in the VIEW.JS');
+        this.notifyObservers('onPostDelete', postId);
+    }
 
     // Form utilities
     populateForm(postData) {
