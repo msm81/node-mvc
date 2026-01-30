@@ -146,8 +146,22 @@ class BlogController {
     }
 
 //   handlePostUpdated(updatedPost) {}
+    handlePostUpdated(updatedPost) {
+        console.log('Post updated successfully');
+
+        this.view.hideEditModal();
+
+        this.view.showSuccess('Post updated successfully!');
+
+        this.loadPosts();
+    }
 
 //   handlePostDeleted(postId) {}
+    handlePostDeleted(postId) {
+        console.log('Post deleted:', postId);
+
+        this.loadPosts();
+    }
 
     handleLoadingStart() {
         console.log('Loading started');
