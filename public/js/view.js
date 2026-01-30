@@ -46,6 +46,8 @@ class BlogView {
         this.setupDOMElements();
         this.renderPostForm();
         this.notifyObservers('onViewInitialized');
+
+        this.attachPostEventListeners();
     }
 
     setupDOMElements() {
@@ -81,7 +83,6 @@ class BlogView {
         this.postsContainer.innerHTML = posts
             .map((post) => this.renderPostCard(post))
             .join('');
-        this.attachPostEventListeners();
     }
 
     renderPostCard(post) {
