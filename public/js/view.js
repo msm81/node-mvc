@@ -118,10 +118,50 @@ class BlogView {
         </div>
       </article>
     `;
+  }
+
     // renderPostContent(content) {}
+    renderPostContent(content) {
+        if (!content) return '';
+
+        // Wrap in paragraph tags for better formatting
+        return content
+            .split('\n')
+            .filter(line => line.trim() !== '') // Remove empty lines
+            .map(line => `<p>${this.escapeHtml(line)}</p>`)
+            .join('');
+    }
 
     // renderPostForm {}
-  }
+    renderPostForm() {
+        this.formContainer.innerHTML = `
+      <form id="post-form" class="blog-form">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" placeholder="Enter post title" required>
+          <div id="title-error" class="error-message" style="display: none"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea id="content" name="content" rows="4" placeholder="Write your content here..." required></textarea>
+          <div id="content-error" class="error-message" style="display: none"></div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            <span class="icon">🚀</span> Publish Post
+          </button>
+        </div>
+      </form>
+    `;
+
+        // Attach listener immediately after rendering
+        const form = document.getElementById('post-form');
+        if (form) {
+            form.addEventListener('submit', this.handleSubmit);
+        }
+    }
 
   // Event handling
   attachPostEventListeners() {
