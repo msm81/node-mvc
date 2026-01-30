@@ -101,6 +101,41 @@ app.get('/api/posts', async (req, res) => {
 });
 
 // POST create a new blog post
+app.post('/api/posts', (req, res) => {
+    const { title, content, author } = req.body;
+    console.log('📝 POST /api/posts - Creating new post:', title);
+
+    if (!title || !content) {
+        return res.status(400).json({ error: 'Title and content are required' });
+    }
+
+    const sql = `INSERT INTO posts (title, content, author) VALUES (?, ?, ?)`;
+    const params = [title, content, author || 'Anonymous'];
+
+    // We use 'function' keyword here to access 'this.lastID'
+    db.run(sql, params, function(err) {
+        if (err) {
+            console.error('Error creating post:', err);
+            return res.status(500).json({ error: 'Failed to create post' });
+        }
+
+        // Fetch the newly created post to return it
+        db.get('SELECT * FROM posts WHERE id = ?', [this.lastID], (err, row) => {
+            if (err) {
+                return res.status(500).json({ error: 'Failed to retrieve created post' });
+            }
+
+            res.status(201).json({
+                id: row.id,
+                title: row.title,
+                content: row.content,
+                author: row.author,
+                createdAt: new Date(row.created_at).toISOString(),
+                updatedAt: new Date(row.updated_at).toISOString()
+            });
+        });
+    });
+});
 
 // PUT update a blog post
 
